@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBB - Painel Administrativo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+        }
+
+        /* Tela de Login */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .login-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-error {
+            color: #ff6b6b;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .login-error.show {
+            display: block;
+        }
+
+        .main-content {
+            display: none;
+        }
+
+        .main-content.show {
+            display: block;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-content {
+            flex: 1;
+        }
+
+        .logout-button {
+            padding: 10px 25px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid white;
+            color: white;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: #16213e;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border-left: 5px solid #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: 900;
+            color: #667eea;
+        }
+
+        .participants-section {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .participant-row {
+            background: #1a1a2e;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: grid;
+            grid-template-columns: 50px 1fr 150px 150px 150px;
+            gap: 20px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .participant-row:hover {
+            background: #0f3460;
+            transform: translateX(5px);
+        }
+
+        .participant-rank {
+            font-size: 2em;
+            font-weight: 900;
+            color: #FF6B35;
+            text-align: center;
+        }
+
+        .participant-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .participant-emoji {
+            font-size: 3em;
+        }
+
+        .participant-name {
+            font-size: 1.3em;
+            font-weight: 700;
+        }
+
+        .participant-votes {
+            text-align: center;
+        }
+
+        .participant-percentage {
+            font-size: 1.8em;
+            font-weight: 900;
+            color: #38ef7d;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #1a1a2e;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .trend-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-weight: 700;
+        }
+
+        .trend-up {
+            color: #38ef7d;
+        }
+
+        .trend-down {
+            color: #ff6b6b;
+        }
+
+        .trend-stable {
+            color: #ffd93d;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .analytics-card {
+            background: #16213e;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .chart-container {
+            height: 250px;
+            margin-top: 20px;
+        }
+
+        .votes-per-minute {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .vpm-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vpm-label {
+            min-width: 100px;
+            font-weight: 600;
+        }
+
+        .vpm-bar-fill {
+            flex: 1;
+            height: 30px;
+            background: linear-gradient(90deg, #FF6B35 0%, #F7931E 100%);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .prediction-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .prediction-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .prediction-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .probability-bar {
+            width: 100%;
+            height: 25px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .probability-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38ef7d 0%, #11998e 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            transition: width 0.5s ease;
+        }
+
+        .controls-section {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a2e;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            color: white;
+            font-size: 1em;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #764ba2;
+        }
+
+        .photo-upload-area {
+            width: 100%;
+            min-height: 200px;
+            background: #1a1a2e;
+            border: 3px dashed #667eea;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-upload-area:hover {
+            border-color: #764ba2;
+            background: #0f1419;
+        }
+
+        .photo-upload-area.has-image {
+            border-style: solid;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+
+        .upload-text {
+            opacity: 0.7;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 200px;
+            display: none;
+        }
+
+        .preview-image.show {
+            display: block;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 107, 107, 0.9);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            display: none;
+        }
+
+        .remove-image.show {
+            display: block;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            margin-right: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #38ef7d 0%, #11998e 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,107,53,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: #FF6B35;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        @media (max-width: 768px) {
+            .participant-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <h1>🔒 Acesso Restrito</h1>
+            <p>Painel Administrativo BBB</p>
+            <input 
+                type="password" 
+                class="login-input" 
+                id="passwordInput" 
+                placeholder="Digite a senha"
+                onkeypress="if(event.key === 'Enter') checkPassword()"
+            >
+            <button class="login-button" onclick="checkPassword()">Entrar</button>
+            <div class="login-error" id="loginError">❌ Senha incorreta!</div>
+        </div>
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <div class="main-content" id="mainContent">
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>🎯 Painel Administrativo</h1>
+                <div class="subtitle">Estatísticas em Tempo Real - BBB</div>
+                <div class="live-indicator" style="margin-top: 15px;">
+                    <div class="live-dot"></div>
+                    <span>AO VIVO</span>
+                </div>
+            </div>
+            <button class="logout-button" onclick="logout()">🚪 Sair</button>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total de Votos</div>
+                <div class="stat-value" id="totalVotes">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Votos por Minuto</div>
+                <div class="stat-value" id="votesPerMinute">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Participantes</div>
+                <div class="stat-value" id="totalParticipants">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Líder Atual</div>
+                <div class="stat-value" id="currentLeader" style="font-size: 1.8em;">-</div>
+            </div>
+        </div>
+
+        <div class="prediction-card">
+            <div class="prediction-title">📊 Análise de Tendências e Probabilidades</div>
+            <div id="predictionsContainer">
+                <div class="prediction-item">
+                    <div>Analisando dados...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <div class="section-title">Votos por Minuto (Últimos 5min)</div>
+                <div class="votes-per-minute" id="vpmChart"></div>
+            </div>
+
+            <div class="analytics-card">
+                <div class="section-title">Maior Crescimento (Última Hora)</div>
+                <div id="topGrowthContainer"></div>
+            </div>
+        </div>
+
+        <div class="participants-section">
+            <div class="section-title">Ranking de Participantes</div>
+            <div id="participantsContainer">
+                <div style="text-align: center; padding: 40px; opacity: 0.5;">
+                    Carregando dados...
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="section-title">Gerenciar Participantes</div>
+            
+            <div class="form-group">
+                <label class="form-label">Foto do Participante</label>
+                <div class="photo-upload-area" id="photoUploadArea" onclick="document.getElementById('imageInput').click()">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">
+                        Clique para fazer upload da foto<br>
+                        <small style="opacity: 0.5;">ou cole a URL da imagem</small>
+                    </div>
+                    <img id="previewImage" class="preview-image" alt="Preview">
+                    <button class="remove-image" id="removeImageBtn" onclick="event.stopPropagation(); removeImage()">✕ Remover</button>
+                </div>
+                <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">OU Cole a URL da Imagem</label>
+                <input type="text" class="form-input" id="imageUrl" placeholder="https://exemplo.com/imagem.jpg" oninput="handleImageUrl(this.value)">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Nome do Participante</label>
+                <input type="text" class="form-input" id="participantName" placeholder="Ex: João Silva">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Emoji (opcional - se não tiver foto)</label>
+                <input type="text" class="form-input" id="participantEmoji" placeholder="👤" maxlength="2">
+            </div>
+            
+            <button class="btn btn-success" onclick="addParticipant()">➕ Adicionar Participante</button>
+            <button class="btn btn-danger" onclick="resetVotes()">🔄 Resetar Todos os Votos</button>
+        </div>
+
+        <a href="index.html" class="back-link">← Voltar para Votação</a>
+    </div>
+    </div>
+    <!-- Fim do Conteúdo Principal -->
+
+    <script>
+        // ============================================
+        // VARIÁVEIS GLOBAIS
+        // ============================================
+        let currentImageData = null;
+        
+        // ============================================
+        // SISTEMA DE AUTENTICAÇÃO
+        // ============================================
+        
+        // ALTERE A SENHA AQUI! 🔑
+        const ADMIN_PASSWORD = "bbb2025";
+        
+        // Verificar se já está logado
+        function checkAuth() {
+            const isAuthenticated = sessionStorage.getItem('adminAuth') === 'true';
+            if (isAuthenticated) {
+                showMainContent();
+            }
+        }
+        
+        // Verificar senha
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminAuth', 'true');
+                showMainContent();
+                errorDiv.classList.remove('show');
+            } else {
+                errorDiv.classList.add('show');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+        
+        // Mostrar conteúdo principal
+        function showMainContent() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('show');
+        }
+        
+        // Logout
+        function logout() {
+            if (confirm('Deseja realmente sair?')) {
+                sessionStorage.removeItem('adminAuth');
+                location.reload();
+            }
+        }
+        
+        // Verificar autenticação ao carregar
+        checkAuth();
+        
+        // ============================================
+        // SISTEMA DE UPLOAD DE IMAGEM
+        // ============================================
+        
+        // Handle file upload
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor, selecione uma imagem válida!');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                window.currentImageData = e.target.result;
+                showImagePreview(e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Handle image URL
+        function handleImageUrl(url) {
+            if (!url) {
+                removeImage();
+                return;
+            }
+            
+            // Validar se é uma URL válida
+            try {
+                new URL(url);
+                window.currentImageData = url;
+                showImagePreview(url);
+            } catch (e) {
+                // URL inválida, não fazer nada
+            }
+        }
+        
+        // Show image preview
+        function showImagePreview(src) {
+            const preview = document.getElementById('previewImage');
+            const uploadArea = document.getElementById('photoUploadArea');
+            const removeBtn = document.getElementById('removeImageBtn');
+            
+            preview.src = src;
+            preview.classList.add('show');
+            uploadArea.classList.add('has-image');
+            removeBtn.classList.add('show');
+            
+            // Esconder textos de upload
+            uploadArea.querySelector('.upload-icon').style.display = 'none';
+            uploadArea.querySelector('.upload-text').style.display = 'none';
+        }
+        
+        // Remove image
+        function removeImage() {
+            const preview = document.getElementById('previewImage');
+            const uploadArea = document.getElementById('photoUploadArea');
+            const removeBtn = document.getElementById('removeImageBtn');
+            const imageInput = document.getElementById('imageInput');
+            const imageUrl = document.getElementById('imageUrl');
+            
+            window.currentImageData = null;
+            preview.classList.remove('show');
+            uploadArea.classList.remove('has-image');
+            removeBtn.classList.remove('show');
+            imageInput.value = '';
+            imageUrl.value = '';
+            
+            // Mostrar textos de upload
+            uploadArea.querySelector('.upload-icon').style.display = 'block';
+            uploadArea.querySelector('.upload-text').style.display = 'block';
+        }
+    </script>
+
+    <script type="module">
+        // ============================================
+        // FIREBASE E RESTO DO CÓDIGO
+        // ============================================
+        
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, onValue, set, get, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Configuração do Firebase - SUBSTITUA COM SUAS CREDENCIAIS
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://SEU_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "SEU_PROJECT_ID",
+            storageBucket: "SEU_PROJECT_ID.appspot.com",
+            messagingSenderId: "SEU_MESSAGING_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let participants = [];
+        let voteLogs = [];
+        let previousVotes = {};
+
+        // Carregar participantes
+        function loadParticipants() {
+            const participantsRef = ref(database, 'participants');
+            onValue(participantsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    participants = Object.entries(data).map(([id, info]) => ({
+                        id,
+                        ...info
+                    }));
+                    updateDashboard();
+                }
+            });
+        }
+
+        // Carregar logs de votos
+        function loadVoteLogs() {
+            const logsRef = ref(database, 'voteLogs');
+            onValue(logsRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    voteLogs = Object.entries(data).map(([id, info]) => ({
+                        id,
+                        ...info
+                    }));
+                    updateAnalytics();
+                }
+            });
+        }
+
+        // Atualizar dashboard
+        function updateDashboard() {
+            const total = participants.reduce((sum, p) => sum + (p.votes || 0), 0);
+            const sorted = [...participants].sort((a, b) => (b.votes || 0) - (a.votes || 0));
+            
+            document.getElementById('totalVotes').textContent = total;
+            document.getElementById('totalParticipants').textContent = participants.length;
+            document.getElementById('currentLeader').textContent = sorted[0]?.name || '-';
+
+            renderParticipants(sorted);
+            calculatePredictions(sorted);
+        }
+
+        // Renderizar participantes
+        function renderParticipants(sorted) {
+            const container = document.getElementById('participantsContainer');
+            const total = participants.reduce((sum, p) => sum + (p.votes || 0), 0);
+
+            if (sorted.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; opacity: 0.5;">Nenhum participante cadastrado</div>';
+                return;
+            }
+
+            container.innerHTML = sorted.map((p, index) => {
+                const percentage = total > 0 ? ((p.votes || 0) / total * 100).toFixed(1) : 0;
+                const trend = calculateTrend(p.id);
+                
+                return `
+                    <div class="participant-row">
+                        <div class="participant-rank">#${index + 1}</div>
+                        <div class="participant-info">
+                            <div class="participant-emoji">${p.emoji || '👤'}</div>
+                            <div>
+                                <div class="participant-name">${p.name}</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${percentage}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="participant-votes">
+                            <div style="opacity: 0.7; font-size: 0.9em;">Votos</div>
+                            <div style="font-size: 1.5em; font-weight: 700;">${p.votes || 0}</div>
+                        </div>
+                        <div class="participant-percentage">${percentage}%</div>
+                        <div class="trend-indicator ${trend.class}">
+                            ${trend.icon} ${trend.text}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Calcular tendência
+        function calculateTrend(participantId) {
+            const current = participants.find(p => p.id === participantId)?.votes || 0;
+            const previous = previousVotes[participantId] || 0;
+            const diff = current - previous;
+
+            if (diff > 5) return { class: 'trend-up', icon: '📈', text: `+${diff}` };
+            if (diff < -5) return { class: 'trend-down', icon: '📉', text: `${diff}` };
+            return { class: 'trend-stable', icon: '➡️', text: 'Estável' };
+        }
+
+        // Atualizar analytics
+        function updateAnalytics() {
+            calculateVotesPerMinute();
+            calculateTopGrowth();
+        }
+
+        // Calcular votos por minuto
+        function calculateVotesPerMinute() {
+            const now = Date.now();
+            const oneMinute = 60 * 1000;
+            const fiveMinutes = 5 * oneMinute;
+
+            // Agrupar por minuto nos últimos 5 minutos
+            const minuteBuckets = {};
+            for (let i = 0; i < 5; i++) {
+                const bucketTime = now - (i * oneMinute);
+                minuteBuckets[i] = voteLogs.filter(log => 
+                    log.timestamp > bucketTime - oneMinute && log.timestamp <= bucketTime
+                ).length;
+            }
+
+            // Renderizar gráfico
+            const container = document.getElementById('vpmChart');
+            const maxVotes = Math.max(...Object.values(minuteBuckets), 1);
+            
+            container.innerHTML = Object.entries(minuteBuckets).reverse().map(([min, votes]) => `
+                <div class="vpm-bar">
+                    <div class="vpm-label">${min === '0' ? 'Agora' : `-${min} min`}</div>
+                    <div class="vpm-bar-fill" style="width: ${(votes / maxVotes) * 100}%">
+                        ${votes} votos
+                    </div>
+                </div>
+            `).join('');
+
+            // Atualizar votos por minuto atual
+            document.getElementById('votesPerMinute').textContent = minuteBuckets[0] || 0;
+        }
+
+        // Calcular maior crescimento
+        function calculateTopGrowth() {
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000;
+
+            const growth = participants.map(p => {
+                const recentVotes = voteLogs.filter(log => 
+                    log.participantId === p.id && log.timestamp > now - oneHour
+                ).length;
+                
+                return {
+                    name: p.name,
+                    emoji: p.emoji,
+                    growth: recentVotes
+                };
+            }).sort((a, b) => b.growth - a.growth);
+
+            const container = document.getElementById('topGrowthContainer');
+            container.innerHTML = growth.slice(0, 3).map((p, i) => `
+                <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 10px;">
+                    <div style="font-size: 2em;">${['🥇', '🥈', '🥉'][i]}</div>
+                    <div style="font-size: 2em;">${p.emoji || '👤'}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 700; font-size: 1.2em;">${p.name}</div>
+                        <div style="opacity: 0.7;">+${p.growth} votos na última hora</div>
+                    </div>
+                </div>
+            `).join('') || '<div style="text-align: center; opacity: 0.5; padding: 20px;">Sem dados suficientes</div>';
+        }
+
+        // Calcular probabilidades de virada
+        function calculatePredictions(sorted) {
+            if (sorted.length < 2) {
+                document.getElementById('predictionsContainer').innerHTML = 
+                    '<div class="prediction-item">Adicione pelo menos 2 participantes para análises</div>';
+                return;
+            }
+
+            const total = sorted.reduce((sum, p) => sum + (p.votes || 0), 0);
+            const leader = sorted[0];
+            const second = sorted[1];
+            
+            const gap = (leader.votes || 0) - (second.votes || 0);
+            const gapPercentage = total > 0 ? (gap / total * 100).toFixed(1) : 0;
+
+            // Calcular taxa de crescimento
+            const now = Date.now();
+            const last15min = 15 * 60 * 1000;
+            
+            const leaderRecent = voteLogs.filter(log => 
+                log.participantId === leader.id && log.timestamp > now - last15min
+            ).length;
+            
+            const secondRecent = voteLogs.filter(log => 
+                log.participantId === second.id && log.timestamp > now - last15min
+            ).length;
+
+            // Probabilidade simplificada de virada
+            let reversalProbability = 0;
+            if (secondRecent > leaderRecent && gap < total * 0.1) {
+                reversalProbability = Math.min(85, 30 + (secondRecent - leaderRecent) * 5);
+            } else if (gap < total * 0.05) {
+                reversalProbability = 50;
+            } else if (gap < total * 0.15) {
+                reversalProbability = 25;
+            } else {
+                reversalProbability = 10;
+            }
+
+            const container = document.getElementById('predictionsContainer');
+            container.innerHTML = `
+                <div class="prediction-item">
+                    <div style="font-size: 1.2em; margin-bottom: 10px;">
+                        <strong>${leader.emoji} ${leader.name}</strong> lidera com <strong>${gapPercentage}%</strong> de diferença
+                    </div>
+                    <div style="opacity: 0.9;">
+                        Diferença: ${gap} votos | Crescimento (15min): ${leader.name} +${leaderRecent}, ${second.name} +${secondRecent}
+                    </div>
+                </div>
+                
+                <div class="prediction-item">
+                    <div style="font-size: 1.1em; margin-bottom: 10px;">
+                        🎲 Probabilidade de <strong>${second.emoji} ${second.name}</strong> virar a liderança:
+                    </div>
+                    <div class="probability-bar">
+                        <div class="probability-fill" style="width: ${reversalProbability}%">
+                            ${reversalProbability}%
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; opacity: 0.8; font-size: 0.9em;">
+                        ${reversalProbability > 60 ? '⚠️ Alta probabilidade de virada!' : 
+                          reversalProbability > 30 ? '⚡ Possível virada se manter ritmo' : 
+                          '✅ Liderança consolidada'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Adicionar participante
+        window.addParticipant = async function() {
+            const name = document.getElementById('participantName').value.trim();
+            const emoji = document.getElementById('participantEmoji').value.trim() || '👤';
+
+            if (!name) {
+                alert('Digite um nome para o participante');
+                return;
+            }
+
+            const newId = 'p' + Date.now();
+            const participantRef = ref(database, `participants/${newId}`);
+            
+            const participantData = {
+                name: name,
+                emoji: emoji,
+                votes: 0
+            };
+            
+            // Adicionar imagem se houver (acessar variável global)
+            if (window.currentImageData) {
+                participantData.image = window.currentImageData;
+            }
+            
+            await set(participantRef, participantData);
+
+            // Limpar formulário
+            document.getElementById('participantName').value = '';
+            document.getElementById('participantEmoji').value = '';
+            window.removeImage();
+            
+            alert('✅ Participante adicionado com sucesso!');
+        };
+
+        // Resetar votos
+        window.resetVotes = async function() {
+            if (!confirm('Tem certeza que deseja resetar TODOS os votos? Esta ação não pode ser desfeita!')) {
+                return;
+            }
+
+            // Resetar votos dos participantes
+            for (const p of participants) {
+                const participantRef = ref(database, `participants/${p.id}/votes`);
+                await set(participantRef, 0);
+            }
+
+            // Limpar logs
+            const logsRef = ref(database, 'voteLogs');
+            await remove(logsRef);
+
+            alert('Votos resetados com sucesso!');
+        };
+
+        // Atualizar votos anteriores a cada 30 segundos
+        setInterval(() => {
+            previousVotes = {};
+            participants.forEach(p => {
+                previousVotes[p.id] = p.votes || 0;
+            });
+        }, 30000);
+
+        // Inicializar
+        loadParticipants();
+        loadVoteLogs();
+        
+        // Atualizar analytics a cada 5 segundos
+        setInterval(updateAnalytics, 5000);
+    </script>
+</body>
+</html>
